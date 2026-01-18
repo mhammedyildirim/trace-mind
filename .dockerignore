@@ -1,0 +1,51 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files - NEVER include in Docker image
+.env
+.env.*
+!.env.example
+
+# Documentation
+README.md
+*.md
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Tests
+test
+coverage
+*.spec.ts
+*.e2e-spec.ts
+
+# Build artifacts (will be rebuilt in container)
+dist
+node_modules
+
+# Docker files
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+
+# Examples
+examples
+
+# Logs
+*.log
+logs
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+.temp
+.cache

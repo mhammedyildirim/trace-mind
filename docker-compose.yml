@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  tracemind:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5002:5002"
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT:-5002}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}
+      - MAX_ANALYSIS_TIMEOUT_MS=${MAX_ANALYSIS_TIMEOUT_MS:-10000}
+      - MIN_TRACE_DURATION_MS=${MIN_TRACE_DURATION_MS:-50}
+    depends_on:
+      - collector
+    restart: unless-stopped
+
+  collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/collector-config.yaml"]
+    volumes:
+      - ./docker/collector-config.yaml:/etc/collector-config.yaml
+    ports:
+      - "4318:4318"  # OTLP HTTP receiver
+    depends_on:
+      - tracemind
+    restart: unless-stopped

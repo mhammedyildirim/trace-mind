@@ -1,0 +1,35 @@
+# TraceMind servisini farklı projelerde kullanmak için örnek docker-compose.yml
+# Bu dosyayı kendi projenize kopyalayıp kullanabilirsiniz
+
+version: '3.8'
+
+services:
+  tracemind:
+    image: YOUR_USERNAME/tracemind:latest  # veya tracemind:latest (local image için)
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=${PORT:-5002}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash}
+      - MAX_ANALYSIS_TIMEOUT_MS=${MAX_ANALYSIS_TIMEOUT_MS:-10000}
+      - MIN_TRACE_DURATION_MS=${MIN_TRACE_DURATION_MS:-50}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # İsteğe bağlı: OpenTelemetry Collector eklemek isterseniz
+  # collector:
+  #   image: otel/opentelemetry-collector:latest
+  #   command: ["--config=/etc/collector-config.yaml"]
+  #   volumes:
+  #     - ./collector-config.yaml:/etc/collector-config.yaml
+  #   ports:
+  #     - "4318:4318"
+  #   depends_on:
+  #     - tracemind
+  #   restart: unless-stopped
